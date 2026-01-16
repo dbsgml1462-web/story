@@ -1,0 +1,154 @@
+@prefix ex:   <http://example.org/patjuk/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+############
+# Classes
+############
+ex:Story        a rdfs:Class .
+ex:Character    a rdfs:Class .
+ex:Animal       a rdfs:Class .
+ex:Object       a rdfs:Class .
+ex:Food         a rdfs:Class .
+ex:Place        a rdfs:Class .
+ex:Event        a rdfs:Class .
+ex:Moral        a rdfs:Class .
+
+############
+# Properties
+############
+ex:title        a rdf:Property .
+ex:hasCharacter a rdf:Property .
+ex:hasPlace     a rdf:Property .
+ex:hasObject    a rdf:Property .
+
+ex:occursIn     a rdf:Property .
+ex:hasActor     a rdf:Property .
+ex:hasTarget    a rdf:Property .
+ex:action       a rdf:Property .
+ex:sequenceNo   a rdf:Property .
+ex:nextEvent    a rdf:Property .
+ex:result       a rdf:Property .
+
+ex:hasMoral     a rdf:Property .
+ex:moralText    a rdf:Property .
+ex:moralTheme   a rdf:Property .
+ex:supportedBy  a rdf:Property .   # 어떤 사건들이 교훈을 뒷받침하는지 연결
+
+############
+# Story
+############
+ex:PatjukGrandmaAndTiger a ex:Story ;
+  ex:title "팥죽할머니와 호랑이"@ko ;
+  ex:hasCharacter ex:Grandma, ex:Tiger, ex:Cow, ex:MillerStone, ex:EarthenwareJar, ex:Needle ;
+  ex:hasPlace ex:GrandmaHouse ;
+  ex:hasObject ex:Patjuk ;
+  ex:hasMoral ex:Moral1, ex:Moral2, ex:Moral3 .
+
+############
+# Characters / Objects / Place
+############
+ex:Grandma a ex:Character ; rdfs:label "팥죽할머니"@ko .
+ex:Tiger   a ex:Animal    ; rdfs:label "호랑이"@ko .
+
+# 조력자(판본에 따라 달라질 수 있어 '대표 요소'로만 둠)
+ex:Cow            a ex:Animal ; rdfs:label "소"@ko .
+ex:MillerStone    a ex:Object ; rdfs:label "맷돌(연자맷돌)"@ko .
+ex:EarthenwareJar a ex:Object ; rdfs:label "옹기(항아리)"@ko .
+ex:Needle         a ex:Object ; rdfs:label "바늘"@ko .
+
+ex:Patjuk a ex:Food ; rdfs:label "팥죽"@ko .
+ex:GrandmaHouse a ex:Place ; rdfs:label "할머니 집"@ko .
+
+############
+# Events (Plot)
+############
+ex:Event1 a ex:Event ;
+  ex:sequenceNo 1 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:Grandma ;
+  ex:action "팥죽을 쑨다"@ko ;
+  ex:result "할머니가 생활을 이어가며 집에 머묾"@ko ;
+  ex:nextEvent ex:Event2 .
+
+ex:Event2 a ex:Event ;
+  ex:sequenceNo 2 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:Tiger ;
+  ex:hasTarget ex:Grandma ;
+  ex:action "할머니를 해치려(잡아먹으려) 찾아온다"@ko ;
+  ex:result "위협 상황이 발생한다"@ko ;
+  ex:nextEvent ex:Event3 .
+
+ex:Event3 a ex:Event ;
+  ex:sequenceNo 3 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:Grandma ;
+  ex:action "조력자들과 함께 대비하고 협력한다"@ko ;
+  ex:result "집 안에 조력자(도구/동물)를 배치한다"@ko ;
+  ex:nextEvent ex:Event4 .
+
+ex:Event4 a ex:Event ;
+  ex:sequenceNo 4 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:Tiger ;
+  ex:action "집에 침입하려 한다"@ko ;
+  ex:result "조력자들의 대응이 시작될 조건이 만들어진다"@ko ;
+  ex:nextEvent ex:Event5 .
+
+ex:Event5 a ex:Event ;
+  ex:sequenceNo 5 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:Cow ;
+  ex:hasTarget ex:Tiger ;
+  ex:action "받아치거나 위협해 저지한다"@ko ;
+  ex:result "호랑이가 당황하거나 물러선다"@ko ;
+  ex:nextEvent ex:Event6 .
+
+ex:Event6 a ex:Event ;
+  ex:sequenceNo 6 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:MillerStone ;
+  ex:hasTarget ex:Tiger ;
+  ex:action "굴러가거나 눌러서 제압한다"@ko ;
+  ex:result "호랑이가 큰 타격을 입는다"@ko ;
+  ex:nextEvent ex:Event7 .
+
+ex:Event7 a ex:Event ;
+  ex:sequenceNo 7 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:EarthenwareJar ;
+  ex:hasTarget ex:Tiger ;
+  ex:action "덮치거나 가두는 데 쓰인다"@ko ;
+  ex:result "호랑이가 움직이기 어려워진다"@ko ;
+  ex:nextEvent ex:Event8 .
+
+ex:Event8 a ex:Event ;
+  ex:sequenceNo 8 ;
+  ex:occursIn ex:GrandmaHouse ;
+  ex:hasActor ex:Needle ;
+  ex:hasTarget ex:Tiger ;
+  ex:action "찌르거나 따끔하게 혼내준다"@ko ;
+  ex:result "호랑이가 달아나며 위협이 해소된다"@ko .
+
+############
+# Morals (Lessons)
+############
+# 1) 협동/연대
+ex:Moral1 a ex:Moral ;
+  ex:moralTheme "협동"@ko ;
+  ex:moralText "위기에서는 혼자보다 서로 힘을 모아 협력하면 더 안전하고 문제를 해결할 수 있다."@ko ;
+  ex:supportedBy ex:Event3, ex:Event5, ex:Event6, ex:Event7, ex:Event8 .
+
+# 2) 지혜/대비
+ex:Moral2 a ex:Moral ;
+  ex:moralTheme "지혜"@ko ;
+  ex:moralText "힘이 약해도 미리 대비하고 지혜롭게 행동하면 강한 상대의 위협을 이겨낼 수 있다."@ko ;
+  ex:supportedBy ex:Event3, ex:Event4, ex:Event6 .
+
+# 3) 경계/침입 금지(타인의 공간 존중)
+ex:Moral3 a ex:Moral ;
+  ex:moralTheme "경계"@ko ;
+  ex:moralText "남의 집이나 남의 삶을 해치려는 욕심과 침입은 결국 스스로를 위험에 빠뜨린다."@ko ;
+  ex:supportedBy ex:Event2, ex:Event4, ex:Event8 .

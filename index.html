@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팥죽할머니와 호랑이</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Nanum+Gothic:wght@400;700;800&display=swap"
+        rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #FFA726;
+            /* Warm Orange */
+            --secondary-color: #FF7043;
+            /* Deep Orange */
+            --bg-color: #FFF3E0;
+            /* Very Light Orange */
+            --accent-color: #4DB6AC;
+            /* Teal */
+            --text-color: #5D4037;
+            /* Brown */
+            --container-bg: #FFFFFF;
+            --container-shadow: 0 8px 16px rgba(93, 64, 55, 0.1);
+        }
+
+        body {
+            font-family: 'Gaegu', cursive;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#FFCC80 2px, transparent 2px);
+            background-size: 30px 30px;
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            /* Full screen height */
+            box-sizing: border-box;
+            overflow: hidden;
+            /* No scrolling */
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 10px 40px;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+
+        .header-img {
+            height: 110px;
+            mix-blend-mode: multiply;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin: 0;
+            text-shadow: 2px 2px 0px #ffe0b2;
+            letter-spacing: -2px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1400px;
+            flex-grow: 1;
+            /* Take remaining space */
+            min-height: 0;
+            /* Important for grid within flex */
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Graph Session */
+        .graph-container {
+            background: var(--container-bg);
+            border-radius: 30px;
+            border: 4px solid var(--primary-color);
+            box-shadow: var(--container-shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-header {
+            padding: 10px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 4px dashed rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+        }
+
+        #mynetwork {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            background: #fffbef;
+        }
+
+        .graph-info {
+            padding: 10px;
+            background: #fffbef;
+            /* Match graph background */
+            text-align: center;
+            font-size: 1.1rem;
+            color: #555;
+            flex-shrink: 0;
+            /* Ensure no visual separation */
+            margin-bottom: -10px;
+            padding-bottom: 20px;
+            z-index: 10;
+        }
+
+        /* Chat Session */
+        .chat-container {
+            background: var(--container-bg);
+            border-radius: 30px;
+            border: 4px solid var(--accent-color);
+            box-shadow: var(--container-shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 10px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 4px dashed rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #fafafa;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: white;
+            border: 2px solid var(--accent-color);
+            border-bottom-left-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--accent-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            background: white;
+            border-top: 3px dashed var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 3px solid #E0E0E0;
+            font-family: 'Gaegu', cursive;
+            font-size: 1.2rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            background-color: #F0F4C3;
+        }
+
+        button#send-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Gaegu', cursive;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 3px 0 #00897B;
+        }
+
+        button#send-btn:hover {
+            transform: translateY(-2px);
+            background-color: #26A69A;
+        }
+
+        button#send-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 #00897B;
+        }
+
+        .tip {
+            display: none;
+            /* Hide tip to save space for single screen */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-container">
+        <img src="illustration.png" alt="귀여운 호랑이 그림" class="header-img">
+        <div style="display: flex; flex-direction: column;">
+            <h1>팥죽할머니와 호랑이</h1>
+            <span
+                style="align-self: flex-end; font-size: 1.5rem; color: #795548; font-weight: bold; margin-top: 5px;">김윤희
+                만듦</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Relationship Graph -->
+        <div class="graph-container">
+            <div class="graph-header">이야기 관계도</div>
+            <div class="graph-info" style="border: none;">
+                인물(동그라미)을 마우스로 클릭하면 챗봇과 연결됩니다!
+            </div>
+            <div id="mynetwork"></div>
+        </div>
+
+        <!-- Chatbot Interface -->
+        <div class="chat-container">
+            <div class="chat-header">이야기 챗봇과 대화하기</div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    안녕! 나는 동화 탐험대 챗봇이야. <br>
+                    "팥죽할머니와 호랑이" 이야기에 대해 궁금한 게 있니? <br>
+                    예: "할머니는 왜 팥죽을 쑤어?", "누가 도와줘?"
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="질문을 입력하세요..."
+                    onkeypress="if(event.keyCode==13) sendMessage()">
+                <button id="send-btn" onclick="sendMessage()">보내기</button>
+            </div>
+        </div>
+    </div>
+
+    <p class="tip">※ 팥죽할머니와 호랑이 데이터를 분석하여 대답합니다.</p>
+
+    <script>
+        // --- 1. Graph Visualization Logic ---
+        function initGraph() {
+            const container = document.getElementById('mynetwork');
+
+            // Nodes based on story.ttl
+            const nodes = new vis.DataSet([
+                { id: 1, label: '팥죽할머니', color: '#ffcc00', shape: 'circle', size: 40, font: { size: 20 } },
+                { id: 2, label: '호랑이', color: '#ff6600', shape: 'circle', size: 40, font: { size: 20 } },
+                { id: 3, label: '소', color: '#cc9966', shape: 'dot', size: 25 },
+                { id: 4, label: '맷돌', color: '#999999', shape: 'dot', size: 25 },
+                { id: 5, label: '옹기', color: '#663300', shape: 'dot', size: 25 },
+                { id: 6, label: '바늘', color: '#33ccff', shape: 'dot', size: 25 },
+                { id: 10, label: '팥죽', color: '#990000', shape: 'star', size: 30 },
+                { id: 20, label: '할머니 집', color: '#7ed6df', shape: 'square', size: 30 },
+                { id: 100, label: '협동(교훈)', color: '#eb4d4b', shape: 'diamond', size: 35 },
+                { id: 101, label: '지혜(교훈)', color: '#6ab04c', shape: 'diamond', size: 35 }
+            ]);
+
+            // Edges based on triples
+            const edges = new vis.DataSet([
+                { from: 1, to: 20, label: '살고있어요' },
+                { from: 1, to: 10, label: '쑤어요' },
+                { from: 2, to: 1, label: '해치려해요' },
+                { from: 2, to: 20, label: '찾아와요' },
+                { from: 1, to: 3, label: '도와줘요' },
+                { from: 1, to: 4, label: '도와줘요' },
+                { from: 1, to: 5, label: '도와줘요' },
+                { from: 1, to: 6, label: '도와줘요' },
+                { from: 3, to: 2, label: '받아쳐요' },
+                { from: 4, to: 2, label: '눌러요' },
+                { from: 5, to: 2, label: '가둬요' },
+                { from: 6, to: 2, label: '찔러요' },
+                { from: 3, to: 100, label: '뒷받침' },
+                { from: 4, to: 100, label: '뒷받침' },
+                { from: 4, to: 101, label: '뒷받침' }
+            ]);
+
+            const data = { nodes, edges };
+            const options = {
+                physics: {
+                    stabilization: true,
+                    barnesHut: {
+                        gravitationalConstant: -2000,
+                        springLength: 150
+                    }
+                },
+                edges: {
+                    arrows: { to: true },
+                    font: { size: 12, strokeWidth: 2, strokeColor: '#ffffff' },
+                    color: '#aaaaaa'
+                }
+            };
+            const network = new vis.Network(container, data, options);
+
+            // Click Interaction
+            network.on("click", function (params) {
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const node = nodes.get(nodeId);
+                    const label = node.label;
+
+                    // Trigger chatbot
+                    const input = document.getElementById('user-input');
+                    input.value = label + "에 대해 알려줘";
+                    sendMessage();
+                }
+            });
+        }
+
+        // --- 2. Chatbot Logic ---
+        const qaData = [
+            { keywords: ['안녕', '반가워'], response: '안녕! 나는 이야기 책방의 수호봇이야. 궁금한 게 있으면 물어봐!' },
+            { keywords: ['할머니', '왜', '팥녀', '우는', '울고'], response: '할머니는 호랑이가 자기를 잡아먹으러 올까 봐 걱정하며 울고 계셨어. 하지만 팥죽을 맛있게 쑤어서 친구들과 나눠 먹고 힘을 내셨지!' },
+            { keywords: ['호랑이', '어떻게', '결말'], response: '호랑이는 할머니를 해치려다가 소, 맷돌, 옹기, 바늘에게 번갈아 가며 공격을 받고 결국 멀리 쫓겨나고 말았어!' },
+            { keywords: ['도와', '누가', '조력자', '친구들'], response: '소와 맷돌, 옹기, 바늘 같은 친구들이 할머니를 도와주었어. 다들 힘을 합쳤지!' },
+            { keywords: ['팥죽', '이유'], response: '할머니는 생활을 이어가기 위해 정성스럽게 팥죽을 쑤셨어. 이 팥죽 덕분에 친구들도 도와주게 되었단다!' },
+            { keywords: ['교훈', '배울점'], response: '이 이야기에서는 "협동"의 중요성을 배울 수 있어. 혼자서는 힘들어도 여럿이 힘을 합치면 무서운 호랑이도 이길 수 있단다!' },
+            { keywords: ['콩쥐'], response: '아! "콩쥐" 이야기도 아주 재미있지. 하지만 지금은 "팥죽할머니와 호랑이" 이야기를 보고 있어. 할머니나 호랑이에 대해 물어봐 줄래?' }
+        ];
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = getBotResponse(text);
+                addMessage(response, 'bot');
+            }, 500);
+        }
+
+        function addMessage(text, sender) {
+            const chatMessages = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}-message`;
+            msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getBotResponse(question) {
+            for (let item of qaData) {
+                if (item.keywords.some(kw => question.includes(kw))) {
+                    return item.response;
+                }
+            }
+            return '그건 정말 궁금한 질문이네! 그래프를 한번 살펴보면 답을 찾을 수 있을지도 몰라. 호랑이나 친구들에 대해 더 물어봐줄래?';
+        }
+
+        // Initialize on load
+        window.onload = initGraph;
+    </script>
+</body>
+
+</html>
